@@ -17,14 +17,13 @@ type Provider struct {
 	logoutUrl     string
 	registerURL   string
 	serviceUrl    string
-	cookieKey     string
 	forceHttps    bool
 	tokenHelper   gofidentweb.TokenHelper
 }
 
 func (p Provider) getCookie(ctx *fasthttp.RequestCtx) string {
 	cookieValue := ctx.Request.Header.Cookie(gofidentweb.TokenName)
-	if len(cookieValue) == 0 {
+	if len(cookieValue) == 0 && p.allowInsecure {
 		cookieValue = ctx.Request.Header.Cookie(gofidentweb.TokenNameNonSecure)
 	}
 	return string(cookieValue)
