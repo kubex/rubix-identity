@@ -1,6 +1,7 @@
 package anonymous
 
 import (
+	"strings"
 	"time"
 
 	"github.com/kubex/rubix-identity/identity"
@@ -8,15 +9,24 @@ import (
 )
 
 type Provider struct {
+	RequireIP string
 }
 
-func (p Provider) IsLoggedIn(ctx *fasthttp.RequestCtx) bool    { return true }
 func (p Provider) LoginUrl(ctx *fasthttp.RequestCtx) string    { return "" }
 func (p Provider) LogoutUrl(ctx *fasthttp.RequestCtx) string   { return "" }
 func (p Provider) RegisterURL(ctx *fasthttp.RequestCtx) string { return "" }
 
-func (p Provider) GetSession(ctx *fasthttp.RequestCtx) (*identity.Session, error) {
+func (p Provider) IsLoggedIn(session *identity.Session) bool {
+	if p.RequireIP == "" {
+		return true
+	}
+	return strings.Contains(p.RequireIP, session.RemoteIP.String())
+}
+
+func (p Provider) HydrateSession(session *identity.Session) error { return nil }
+func (p Provider) CreateSession(ctx *fasthttp.RequestCtx) (*identity.Session, error) {
 	return &identity.Session{
+		RemoteIP:        ctx.RemoteIP(),
 		SessionID:       "anonymous",
 		MFA:             false,
 		VerifiedAccount: false,

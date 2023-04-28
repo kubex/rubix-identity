@@ -1,6 +1,11 @@
 package identity
 
-import "time"
+import (
+	"context"
+	"github.com/valyala/fasthttp"
+	"net"
+	"time"
+)
 
 type User struct {
 	IdentityID string
@@ -10,6 +15,7 @@ type User struct {
 
 type Session struct {
 	SessionID       string
+	RemoteIP        net.IP
 	User            *User
 	MFA             bool
 	VerifiedAccount bool
@@ -19,4 +25,7 @@ type Session struct {
 	Scopes          []string
 	Audience        []string
 	Issuer          string
+	IsLoggedIn      bool
+	RequestContext  *fasthttp.RequestCtx
+	ProviderContext context.Context // Context for the session provider to use
 }
