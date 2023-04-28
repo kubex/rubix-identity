@@ -32,9 +32,8 @@ func (p Provider) HydrateSession(session *identity.Session) error { return nil }
 func (p Provider) CreateSession(ctx *fasthttp.RequestCtx) (*identity.Session, error) {
 	rCtx := context.Background()
 
-	iSession := &identity.Session{
-		ProviderContext: rCtx,
-	}
+	iSession := identity.NewSession(ctx)
+	iSession.ProviderContext = rCtx
 
 	kratosCookie := ctx.Request.Header.Cookie(p.config.CookieName)
 	session, resp, err := p.api.FrontendApi.ToSession(rCtx).Cookie(p.config.CookieName + "=" + string(kratosCookie)).Execute()

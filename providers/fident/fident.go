@@ -52,12 +52,10 @@ func (p Provider) IsLoggedIn(session *identity.Session) bool { return session.Is
 func (p Provider) CreateSession(ctx *fasthttp.RequestCtx) (*identity.Session, error) {
 	_, err := p.tokenHelper.VerifyToken(p.getCookie(ctx))
 
-	session := &identity.Session{
-		IsLoggedIn:     err == nil,
-		Scopes:         nil,
-		Audience:       nil,
-		RequestContext: ctx,
-	}
+	session := identity.NewSession(ctx)
+	session.IsLoggedIn = err == nil
+	session.Scopes = nil
+	session.Audience = nil
 
 	return session, nil
 }
