@@ -34,19 +34,25 @@ func New(cfg Config) (*Provider, error) {
 func (p Provider) IsLoggedIn(session *identity.Session) bool      { return session.IsLoggedIn }
 func (p Provider) HydrateSession(session *identity.Session) error { return nil }
 func (p Provider) CreateSession(ctx *fasthttp.RequestCtx) (*identity.Session, error) {
-	rCtx := context.Background()
-
-	iSession := identity.NewSession(ctx)
-	iSession.ProviderContext = rCtx
 
 	kratosCookie := ctx.Request.Header.Cookie(p.config.CookieName)
+	log.Println("Creating a session")
 	if itm, cached := p.sessionCache.GetItem(string(kratosCookie)); cached {
 		if itm != nil && !itm.Expired() {
-			if session, ok := itm.GetValue().(*identity.Session); ok {
+			data := itm.GetValue()
+			if session, ok := data.(*identity.Session); ok {
+				log.Println("Using cached session")
 				return session, nil
 			}
+			log.Println("Cached session is not a session")
+		} else {
+			log.Println("Cached session has expired")
 		}
 	}
+
+	rCtx := context.Background()
+	iSession := identity.NewSession(ctx)
+	iSession.ProviderContext = rCtx
 
 	session, resp, err := p.api.FrontendApi.ToSession(rCtx).Cookie(p.config.CookieName + "=" + string(kratosCookie)).Execute()
 	log.Println(resp, err)

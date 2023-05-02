@@ -1,6 +1,7 @@
 package anonymous
 
 import (
+	"log"
 	"strings"
 	"time"
 
@@ -25,6 +26,7 @@ func (p Provider) IsLoggedIn(session *identity.Session) bool {
 
 func (p Provider) HydrateSession(session *identity.Session) error { return nil }
 func (p Provider) CreateSession(ctx *fasthttp.RequestCtx) (*identity.Session, error) {
+	log.Println("Creating anonymous session")
 	s := identity.NewSession(ctx)
 	s.SessionID = "anonymous"
 	s.MFA = false
