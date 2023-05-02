@@ -5,19 +5,23 @@ import (
 	"encoding/json"
 	"github.com/kubex/rubix-identity/identity"
 	ory "github.com/ory/client-go"
+	"github.com/packaged/ttlmap"
 	"github.com/valyala/fasthttp"
 	"log"
+	"time"
 )
 
 type Provider struct {
-	config    Config
-	oryConfig *ory.Configuration
-	api       *ory.APIClient
+	config       Config
+	oryConfig    *ory.Configuration
+	api          *ory.APIClient
+	sessionCache ttlmap.CacheMap
 }
 
 func New(cfg Config) (*Provider, error) {
 	p := &Provider{
-		config: cfg,
+		config:       cfg,
+		sessionCache: ttlmap.New(),
 	}
 
 	p.oryConfig = ory.NewConfiguration()
@@ -36,6 +40,14 @@ func (p Provider) CreateSession(ctx *fasthttp.RequestCtx) (*identity.Session, er
 	iSession.ProviderContext = rCtx
 
 	kratosCookie := ctx.Request.Header.Cookie(p.config.CookieName)
+	if itm, cached := p.sessionCache.GetItem(string(kratosCookie)); cached {
+		if itm != nil && !itm.Expired() {
+			if session, ok := itm.GetValue().(*identity.Session); ok {
+				return session, nil
+			}
+		}
+	}
+
 	session, resp, err := p.api.FrontendApi.ToSession(rCtx).Cookie(p.config.CookieName + "=" + string(kratosCookie)).Execute()
 	log.Println(resp, err)
 	if session != nil {
@@ -69,6 +81,10 @@ func (p Provider) CreateSession(ctx *fasthttp.RequestCtx) (*identity.Session, er
 				iSession.User.Name = iTrait.Name.First + " " + iTrait.Name.Last
 			}
 		}
+
+		timeout := time.Second * 60
+		p.sessionCache.Set(string(kratosCookie), iSession, &timeout)
+
 	}
 
 	return iSession, nil

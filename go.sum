@@ -22,6 +22,8 @@ github.com/klauspost/compress v1.15.0/go.mod h1:/3/Vjq9QcHkK5uEr5lBEmyoZ1iFhe47e
 github.com/klauspost/cpuid v1.2.1/go.mod h1:Pj4uuM528wm8OyEC2QMXAi2YiTZ96dNQPGgoMS4s3ek=
 github.com/ory/client-go v1.1.24 h1:iuhRLChgbUJnwRGBVQO5pbOWxjUOWvTP/MUyB3hsfuY=
 github.com/ory/client-go v1.1.24/go.mod h1:LxwbZrflTkCov3VFKY51C/q7ixJ2bajkHaeecPCBr1k=
+github.com/packaged/ttlmap v1.0.0 h1:m1ZmB3F12WmP7L913KOTgi0uyey53DD17SN1Bt21Tho=
+github.com/packaged/ttlmap v1.0.0/go.mod h1:yBkDCcQCijbqB11r6dvf94lxkzEicTo7UWQuQBe6uLw=
 github.com/valyala/bytebufferpool v1.0.0 h1:GqA5TC/0021Y/b9FG4Oi9Mr3q7XYx6KllzawFIhcdPw=
 github.com/valyala/bytebufferpool v1.0.0/go.mod h1:6bBcMArwyJ5K/AmCkWv1jt77kVWyCJ6HpOuEn7z0Csc=
 github.com/valyala/fasthttp v1.9.0/go.mod h1:FstJa9V+Pj9vQ7OJie2qMHdwemEDaDiSdBnvPM1Su9w=
