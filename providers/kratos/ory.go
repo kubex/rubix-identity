@@ -6,7 +6,6 @@ import (
 	"github.com/kubex/rubix-identity/identity"
 	ory "github.com/ory/client-go"
 	"github.com/valyala/fasthttp"
-	"log"
 )
 
 type Provider struct {
@@ -66,7 +65,6 @@ func (p Provider) CreateSession(ctx *fasthttp.RequestCtx) (*identity.Session, er
 		if traitBytes, err := json.Marshal(session.Identity.Traits); err == nil {
 			iTrait := identityTrait{}
 			if err := json.Unmarshal(traitBytes, &iTrait); err == nil {
-				log.Println(iTrait)
 				iSession.User.Username = iTrait.Email
 				iSession.User.Name = iTrait.Name.First + " " + iTrait.Name.Last
 			}
