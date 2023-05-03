@@ -39,8 +39,7 @@ func (p Provider) CreateSession(ctx *fasthttp.RequestCtx) (*identity.Session, er
 	iSession := identity.NewSession(ctx)
 	iSession.ProviderContext = rCtx
 
-	session, resp, err := p.api.FrontendApi.ToSession(rCtx).Cookie(p.config.CookieName + "=" + kratosCookie).Execute()
-	log.Println(resp, err)
+	session, _, _ := p.api.FrontendApi.ToSession(rCtx).Cookie(p.config.CookieName + "=" + kratosCookie).Execute()
 	if session != nil {
 		iSession.IsLoggedIn = true
 
