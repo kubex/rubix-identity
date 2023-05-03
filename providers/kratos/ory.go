@@ -33,11 +33,14 @@ func New(cfg Config) (*Provider, error) {
 
 func (p Provider) IsLoggedIn(session *identity.Session) bool      { return session.IsLoggedIn }
 func (p Provider) HydrateSession(session *identity.Session) error { return nil }
+func (p Provider) CacheID(ctx *fasthttp.RequestCtx) string {
+	return string(ctx.Request.Header.Cookie(p.config.CookieName))
+}
 func (p Provider) CreateSession(ctx *fasthttp.RequestCtx) (*identity.Session, error) {
 
-	kratosCookie := ctx.Request.Header.Cookie(p.config.CookieName)
+	kratosCookie := p.CacheID(ctx)
 	log.Println("Creating a session")
-	if itm, cached := p.sessionCache.GetItem(string(kratosCookie)); cached {
+	if itm, cached := p.sessionCache.GetItem(kratosCookie); cached {
 		if itm != nil && !itm.Expired() {
 			data := itm.GetValue()
 			if session, ok := data.(*identity.Session); ok {
@@ -54,7 +57,7 @@ func (p Provider) CreateSession(ctx *fasthttp.RequestCtx) (*identity.Session, er
 	iSession := identity.NewSession(ctx)
 	iSession.ProviderContext = rCtx
 
-	session, resp, err := p.api.FrontendApi.ToSession(rCtx).Cookie(p.config.CookieName + "=" + string(kratosCookie)).Execute()
+	session, resp, err := p.api.FrontendApi.ToSession(rCtx).Cookie(p.config.CookieName + "=" + kratosCookie).Execute()
 	log.Println(resp, err)
 	if session != nil {
 		iSession.IsLoggedIn = true
@@ -89,7 +92,7 @@ func (p Provider) CreateSession(ctx *fasthttp.RequestCtx) (*identity.Session, er
 		}
 
 		timeout := time.Second * 60
-		p.sessionCache.Set(string(kratosCookie), iSession, &timeout)
+		p.sessionCache.Set(kratosCookie, iSession, &timeout)
 
 	}
 

@@ -16,6 +16,7 @@ type Provider struct {
 func (p Provider) LoginUrl(ctx *fasthttp.RequestCtx) string    { return "" }
 func (p Provider) LogoutUrl(ctx *fasthttp.RequestCtx) string   { return "" }
 func (p Provider) RegisterURL(ctx *fasthttp.RequestCtx) string { return "" }
+func (p Provider) CacheID(ctx *fasthttp.RequestCtx) string     { return "" }
 
 func (p Provider) IsLoggedIn(session *identity.Session) bool {
 	if p.RequireIP == "" {

@@ -43,6 +43,8 @@ func (p Provider) LoginUrl(ctx *fasthttp.RequestCtx) string {
 
 func (p Provider) LogoutUrl(ctx *fasthttp.RequestCtx) string { return p.logoutUrl }
 
+func (p Provider) CacheID(ctx *fasthttp.RequestCtx) string { return "" }
+
 func (p Provider) RegisterURL(ctx *fasthttp.RequestCtx) string {
 	return p.registerURL + "?destination=" + p.returnDest(ctx)
 }
