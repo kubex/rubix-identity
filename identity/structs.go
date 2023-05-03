@@ -30,6 +30,20 @@ type Session struct {
 	ProviderContext context.Context // Context for the session provider to use
 }
 
+func (s *Session) ID() string {
+	if s == nil {
+		return ""
+	}
+	return s.SessionID
+}
+
+func (s *Session) UserID() string {
+	if s == nil || s.User == nil {
+		return ""
+	}
+	return s.User.IdentityID
+}
+
 func NewSession(ctx *fasthttp.RequestCtx) *Session {
 	return &Session{
 		RemoteIP:       realip.FromRequest(ctx),
