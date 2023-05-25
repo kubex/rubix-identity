@@ -85,5 +85,5 @@ func (p Provider) LoginUrl(ctx *fasthttp.RequestCtx) string {
 func (p Provider) LogoutUrl(ctx *fasthttp.RequestCtx) string { return p.config.LogoutUrl }
 
 func (p Provider) RegisterURL(ctx *fasthttp.RequestCtx) string {
-	return p.config.SignupUrl + "?destination=" + p.returnDest(ctx)
+	return p.config.SignupUrl + "?return_to=" + p.returnDest(ctx)
 }
