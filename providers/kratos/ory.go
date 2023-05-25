@@ -79,7 +79,7 @@ func (p Provider) returnDest(ctx *fasthttp.RequestCtx) string {
 }
 
 func (p Provider) LoginUrl(ctx *fasthttp.RequestCtx) string {
-	return p.config.LoginUrl + "?destination=" + p.returnDest(ctx)
+	return p.config.LoginUrl + "?return_to=" + p.returnDest(ctx)
 }
 
 func (p Provider) LogoutUrl(ctx *fasthttp.RequestCtx) string { return p.config.LogoutUrl }
