@@ -85,10 +85,10 @@ func (p Provider) CreateSession(ctx *fasthttp.RequestCtx) (*identity.Session, er
 	}
 
 	rawSplit := strings.Split(token.Raw+"...", ".")
-	rawJwt, _ := base64.StdEncoding.DecodeString(rawSplit[1])
+	rawJwt, _ := base64.RawURLEncoding.DecodeString(rawSplit[1])
 
 	session := oryJwt{}
-	json.Unmarshal(rawJwt, &session)
+	_ = json.Unmarshal(rawJwt, &session)
 	if session.Iss != iSession.Issuer || session.Session == nil {
 		return iSession, nil
 	}
@@ -108,6 +108,14 @@ func (p Provider) CreateSession(ctx *fasthttp.RequestCtx) (*identity.Session, er
 	for _, addr := range session.Session.Identity.VerifiableAddresses {
 		if addr.Verified {
 			iSession.VerifiedAccount = addr.Verified
+		}
+	}
+
+	if traitBytes, err := json.Marshal(session.Session.Identity.Traits); err == nil {
+		iTrait := identityTrait{}
+		if err := json.Unmarshal(traitBytes, &iTrait); err == nil {
+			iSession.User.Username = iTrait.Email
+			iSession.User.Name = iTrait.Name.First + " " + iTrait.Name.Last
 		}
 	}
 
