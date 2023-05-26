@@ -63,7 +63,7 @@ func (p Provider) CreateSession(ctx *fasthttp.RequestCtx) (*identity.Session, er
 		return iSession, nil
 	}
 
-	iSession.IsLoggedIn = token.Valid
+	iSession.IsLoggedIn = token.Valid || p.config.VerifySecret == ""
 
 	claims := token.Claims
 
