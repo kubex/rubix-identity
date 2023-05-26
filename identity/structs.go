@@ -26,8 +26,8 @@ type Session struct {
 	Audience        []string
 	Issuer          string
 	IsLoggedIn      bool
-	RequestContext  *fasthttp.RequestCtx
-	ProviderContext context.Context // Context for the session provider to use
+	RequestContext  *fasthttp.RequestCtx `json:"-"`
+	ProviderContext context.Context      `json:"-"` // Context for the session provider to use
 }
 
 func (s *Session) ID() string {
