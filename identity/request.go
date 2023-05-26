@@ -9,6 +9,15 @@ type Request struct {
 	Cookies    []*http.Cookie
 }
 
+func RequestFromHttp(r *http.Request) *Request {
+	return &Request{
+		Header:     r.Header,
+		RequestUri: r.RequestURI,
+		Cookies:    r.Cookies(),
+		RemoteIP:   r.RemoteAddr,
+	}
+}
+
 func (r Request) CookieValue(name string) string {
 	cookie := r.Cookie(name)
 	if cookie == nil {
