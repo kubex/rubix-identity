@@ -7,7 +7,6 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/kubex/rubix-identity/identity"
 	ory "github.com/ory/client-go"
-	"github.com/valyala/fasthttp"
 	"strings"
 	"time"
 )
@@ -24,13 +23,13 @@ func New(cfg Config) (*Provider, error) {
 	return p, nil
 }
 
-func (p Provider) getToken(ctx *fasthttp.RequestCtx) *jwt.Token {
+func (p Provider) getToken(ctx *identity.Request) *jwt.Token {
 	jwtString := ""
 
 	if p.config.CookieName != "" {
-		jwtString = string(ctx.Request.Header.Cookie(p.config.CookieName))
+		jwtString = ctx.CookieValue(p.config.CookieName)
 	} else if p.config.HeaderName != "" {
-		jwtString = string(ctx.Request.Header.Peek(p.config.HeaderName))
+		jwtString = ctx.Header.Get(p.config.HeaderName)
 	}
 
 	if len(jwtString) > 10 && jwtString[:7] == "Bearer " {
@@ -51,7 +50,7 @@ func (p Provider) verifyToken(token *jwt.Token) (interface{}, error) {
 func (p Provider) IsLoggedIn(session *identity.Session) bool      { return session.IsLoggedIn }
 func (p Provider) HydrateSession(session *identity.Session) error { return nil }
 
-func (p Provider) CreateSession(ctx *fasthttp.RequestCtx) (*identity.Session, error) {
+func (p Provider) CreateSession(ctx *identity.Request) (*identity.Session, error) {
 
 	rCtx := context.Background()
 	iSession := identity.NewSession(ctx)
@@ -122,18 +121,14 @@ func (p Provider) CreateSession(ctx *fasthttp.RequestCtx) (*identity.Session, er
 	return iSession, nil
 }
 
-func (p Provider) CacheID(ctx *fasthttp.RequestCtx) string { return "" } // No need to cache the JWT
+func (p Provider) CacheID(ctx *identity.Request) string { return "" } // No need to cache the JWT
 
-func (p Provider) returnDest(ctx *fasthttp.RequestCtx) string {
-	return ctx.URI().String()
+func (p Provider) LoginUrl(ctx *identity.Request) string {
+	return p.config.LoginUrl + "?return_to=" + ctx.RequestUri
 }
 
-func (p Provider) LoginUrl(ctx *fasthttp.RequestCtx) string {
-	return p.config.LoginUrl + "?return_to=" + p.returnDest(ctx)
-}
+func (p Provider) LogoutUrl(ctx *identity.Request) string { return p.config.LogoutUrl }
 
-func (p Provider) LogoutUrl(ctx *fasthttp.RequestCtx) string { return p.config.LogoutUrl }
-
-func (p Provider) RegisterURL(ctx *fasthttp.RequestCtx) string {
-	return p.config.SignupUrl + "?return_to=" + p.returnDest(ctx)
+func (p Provider) RegisterURL(ctx *identity.Request) string {
+	return p.config.SignupUrl + "?return_to=" + ctx.RequestUri
 }

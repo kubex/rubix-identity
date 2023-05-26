@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"github.com/kubex/rubix-identity/identity"
 	ory "github.com/ory/client-go"
-	"github.com/valyala/fasthttp"
 )
 
 type Provider struct {
@@ -28,10 +27,10 @@ func New(cfg Config) (*Provider, error) {
 
 func (p Provider) IsLoggedIn(session *identity.Session) bool      { return session.IsLoggedIn }
 func (p Provider) HydrateSession(session *identity.Session) error { return nil }
-func (p Provider) CacheID(ctx *fasthttp.RequestCtx) string {
-	return string(ctx.Request.Header.Cookie(p.config.CookieName))
+func (p Provider) CacheID(ctx *identity.Request) string {
+	return ctx.CookieValue(p.config.CookieName)
 }
-func (p Provider) CreateSession(ctx *fasthttp.RequestCtx) (*identity.Session, error) {
+func (p Provider) CreateSession(ctx *identity.Request) (*identity.Session, error) {
 
 	kratosCookie := p.CacheID(ctx)
 	rCtx := context.Background()
@@ -74,16 +73,12 @@ func (p Provider) CreateSession(ctx *fasthttp.RequestCtx) (*identity.Session, er
 	return iSession, nil
 }
 
-func (p Provider) returnDest(ctx *fasthttp.RequestCtx) string {
-	return ctx.URI().String()
+func (p Provider) LoginUrl(ctx *identity.Request) string {
+	return p.config.LoginUrl + "?return_to=" + ctx.RequestUri
 }
 
-func (p Provider) LoginUrl(ctx *fasthttp.RequestCtx) string {
-	return p.config.LoginUrl + "?return_to=" + p.returnDest(ctx)
-}
+func (p Provider) LogoutUrl(ctx *identity.Request) string { return p.config.LogoutUrl }
 
-func (p Provider) LogoutUrl(ctx *fasthttp.RequestCtx) string { return p.config.LogoutUrl }
-
-func (p Provider) RegisterURL(ctx *fasthttp.RequestCtx) string {
-	return p.config.SignupUrl + "?return_to=" + p.returnDest(ctx)
+func (p Provider) RegisterURL(ctx *identity.Request) string {
+	return p.config.SignupUrl + "?return_to=" + ctx.RequestUri
 }

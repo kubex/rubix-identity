@@ -6,17 +6,16 @@ import (
 	"time"
 
 	"github.com/kubex/rubix-identity/identity"
-	"github.com/valyala/fasthttp"
 )
 
 type Provider struct {
 	RequireIP string
 }
 
-func (p Provider) LoginUrl(ctx *fasthttp.RequestCtx) string    { return "" }
-func (p Provider) LogoutUrl(ctx *fasthttp.RequestCtx) string   { return "" }
-func (p Provider) RegisterURL(ctx *fasthttp.RequestCtx) string { return "" }
-func (p Provider) CacheID(ctx *fasthttp.RequestCtx) string     { return "" }
+func (p Provider) LoginUrl(ctx *identity.Request) string    { return "" }
+func (p Provider) LogoutUrl(ctx *identity.Request) string   { return "" }
+func (p Provider) RegisterURL(ctx *identity.Request) string { return "" }
+func (p Provider) CacheID(ctx *identity.Request) string     { return "" }
 
 func (p Provider) IsLoggedIn(session *identity.Session) bool {
 	if p.RequireIP == "" {
@@ -26,7 +25,7 @@ func (p Provider) IsLoggedIn(session *identity.Session) bool {
 }
 
 func (p Provider) HydrateSession(session *identity.Session) error { return nil }
-func (p Provider) CreateSession(ctx *fasthttp.RequestCtx) (*identity.Session, error) {
+func (p Provider) CreateSession(ctx *identity.Request) (*identity.Session, error) {
 	log.Println("Creating anonymous session")
 	s := identity.NewSession(ctx)
 	s.SessionID = "anonymous"

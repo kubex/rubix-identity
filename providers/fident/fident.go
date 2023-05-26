@@ -7,7 +7,6 @@ import (
 
 	gofidentweb "github.com/fident/go-web"
 	"github.com/kubex/rubix-identity/identity"
-	"github.com/valyala/fasthttp"
 )
 
 type Provider struct {
@@ -22,36 +21,36 @@ type Provider struct {
 	tokenHelper   gofidentweb.TokenHelper
 }
 
-func (p Provider) getCookie(ctx *fasthttp.RequestCtx) string {
-	cookieValue := ctx.Request.Header.Cookie(gofidentweb.TokenName)
+func (p Provider) getCookie(ctx *identity.Request) string {
+	cookieValue := ctx.CookieValue(gofidentweb.TokenName)
 	if len(cookieValue) == 0 && p.allowInsecure {
-		cookieValue = ctx.Request.Header.Cookie(gofidentweb.TokenNameNonSecure)
+		cookieValue = ctx.CookieValue(gofidentweb.TokenNameNonSecure)
 	}
-	return string(cookieValue)
+	return cookieValue
 }
 
-func (p Provider) returnDest(ctx *fasthttp.RequestCtx) string {
+func (p Provider) returnDest(ctx *identity.Request) string {
 	if p.forceHttps {
-		return strings.Replace(ctx.URI().String(), "http:", "https:", 1)
+		return strings.Replace(ctx.RequestUri, "http:", "https:", 1)
 	}
-	return ctx.URI().String()
+	return ctx.RequestUri
 }
 
-func (p Provider) LoginUrl(ctx *fasthttp.RequestCtx) string {
+func (p Provider) LoginUrl(ctx *identity.Request) string {
 	return p.loginUrl + "?destination=" + p.returnDest(ctx)
 }
 
-func (p Provider) LogoutUrl(ctx *fasthttp.RequestCtx) string { return p.logoutUrl }
+func (p Provider) LogoutUrl(ctx *identity.Request) string { return p.logoutUrl }
 
-func (p Provider) CacheID(ctx *fasthttp.RequestCtx) string { return "" }
+func (p Provider) CacheID(ctx *identity.Request) string { return "" }
 
-func (p Provider) RegisterURL(ctx *fasthttp.RequestCtx) string {
+func (p Provider) RegisterURL(ctx *identity.Request) string {
 	return p.registerURL + "?destination=" + p.returnDest(ctx)
 }
 
 func (p Provider) IsLoggedIn(session *identity.Session) bool { return session.IsLoggedIn }
 
-func (p Provider) CreateSession(ctx *fasthttp.RequestCtx) (*identity.Session, error) {
+func (p Provider) CreateSession(ctx *identity.Request) (*identity.Session, error) {
 	_, err := p.tokenHelper.VerifyToken(p.getCookie(ctx))
 
 	session := identity.NewSession(ctx)
@@ -64,11 +63,11 @@ func (p Provider) CreateSession(ctx *fasthttp.RequestCtx) (*identity.Session, er
 
 func (p Provider) HydrateSession(session *identity.Session) error {
 
-	if session.RequestContext == nil {
+	if session.ForRequest == nil {
 		return errors.New("request context is not available")
 	}
 
-	u, err := p.tokenHelper.VerifyToken(p.getCookie(session.RequestContext))
+	u, err := p.tokenHelper.VerifyToken(p.getCookie(session.ForRequest))
 	if err != nil {
 		return err
 	}
@@ -93,7 +92,7 @@ func (p Provider) HydrateSession(session *identity.Session) error {
 	return nil
 }
 
-func (p Provider) GetSession(ctx *fasthttp.RequestCtx) (*identity.Session, error) {
+func (p Provider) GetSession(ctx *identity.Request) (*identity.Session, error) {
 	u, err := p.tokenHelper.VerifyToken(p.getCookie(ctx))
 	if err != nil {
 		return nil, err

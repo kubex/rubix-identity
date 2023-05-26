@@ -2,8 +2,6 @@ package identity
 
 import (
 	"context"
-	"github.com/ferluci/fast-realip"
-	"github.com/valyala/fasthttp"
 	"time"
 )
 
@@ -26,8 +24,8 @@ type Session struct {
 	Audience        []string
 	Issuer          string
 	IsLoggedIn      bool
-	RequestContext  *fasthttp.RequestCtx `json:"-"`
-	ProviderContext context.Context      `json:"-"` // Context for the session provider to use
+	ForRequest      *Request        `json:"-"`
+	ProviderContext context.Context `json:"-"` // Context for the session provider to use
 }
 
 func (s *Session) ID() string {
@@ -44,9 +42,9 @@ func (s *Session) UserID() string {
 	return s.User.IdentityID
 }
 
-func NewSession(ctx *fasthttp.RequestCtx) *Session {
+func NewSession(ctx *Request) *Session {
 	return &Session{
-		RemoteIP:       realip.FromRequest(ctx),
-		RequestContext: ctx,
+		RemoteIP:   ctx.RemoteIP,
+		ForRequest: ctx,
 	}
 }
