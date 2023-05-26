@@ -18,6 +18,7 @@ type Config struct {
 
 func FromJson(data []byte) (*Provider, error) {
 	cfg := Config{
+		ForceHttps: true,
 		CookieName: "ory_kratos_session",
 	}
 	if err := json.Unmarshal(data, &cfg); err == nil {
