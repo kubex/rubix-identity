@@ -3,8 +3,7 @@ module github.com/kubex/rubix-identity
 go 1.19
 
 require (
-	github.com/fident/go-web v0.0.0-20210803103323-c08c4e427037
-	github.com/golang-jwt/jwt v3.2.2+incompatible
+	github.com/MicahParks/keyfunc/v2 v2.1.0
 	github.com/golang-jwt/jwt/v5 v5.0.0
 	github.com/ory/client-go v1.1.24
 )

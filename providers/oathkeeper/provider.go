@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"github.com/MicahParks/keyfunc/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/kubex/rubix-identity/identity"
 	ory "github.com/ory/client-go"
@@ -44,7 +45,20 @@ func (p Provider) getToken(ctx *identity.Request) *jwt.Token {
 }
 
 func (p Provider) verifyToken(token *jwt.Token) (interface{}, error) {
-	return []byte(p.config.VerifySecret), nil
+
+	if p.config.VerifySecret != "" {
+		return []byte(p.config.VerifySecret), nil
+	}
+
+	if p.config.JwksUrl != "" {
+		return keyfunc.Get(p.config.JwksUrl, keyfunc.Options{})
+	}
+
+	if p.config.Jwks != nil {
+		return keyfunc.NewJSON(p.config.Jwks)
+	}
+
+	return nil, nil
 }
 
 func (p Provider) IsLoggedIn(session *identity.Session) bool      { return session.IsLoggedIn }

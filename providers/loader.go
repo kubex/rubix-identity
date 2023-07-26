@@ -8,7 +8,6 @@ import (
 
 	"github.com/kubex/rubix-identity/identity"
 	"github.com/kubex/rubix-identity/providers/anonymous"
-	"github.com/kubex/rubix-identity/providers/fident"
 )
 
 func Load(jsonBytes []byte) (identity.Provider, error) {
@@ -24,8 +23,6 @@ func Load(jsonBytes []byte) (identity.Provider, error) {
 	}
 
 	switch loader.Provider {
-	case fident.ProviderKey:
-		return fident.FromJson(*loader.Configuration)
 	case anonymous.ProviderKey:
 		return anonymous.FromJson(*loader.Configuration)
 	case kratos.ProviderKey:
