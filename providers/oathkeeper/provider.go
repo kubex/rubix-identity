@@ -76,7 +76,12 @@ func (p Provider) CreateSession(ctx *identity.Request) (*identity.Session, error
 		return iSession, nil
 	}
 
-	iSession.IsLoggedIn = token.Valid || p.config.VerifySecret == ""
+	iSession.IsLoggedIn = token.Valid
+	if !token.Valid {
+		if p.config.VerifySecret == "" && p.config.JwksUrl == "" && p.config.Jwks == nil {
+			iSession.IsLoggedIn = true
+		}
+	}
 
 	claims := token.Claims
 
@@ -103,6 +108,7 @@ func (p Provider) CreateSession(ctx *identity.Request) (*identity.Session, error
 	session := oryJwt{}
 	_ = json.Unmarshal(rawJwt, &session)
 	if session.Iss != iSession.Issuer || session.Session == nil {
+		iSession.IsLoggedIn = false
 		return iSession, nil
 	}
 
