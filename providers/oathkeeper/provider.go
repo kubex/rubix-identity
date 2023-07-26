@@ -51,11 +51,19 @@ func (p Provider) verifyToken(token *jwt.Token) (interface{}, error) {
 	}
 
 	if p.config.JwksUrl != "" {
-		return keyfunc.Get(p.config.JwksUrl, keyfunc.Options{})
+		if jwks, err := keyfunc.Get(p.config.JwksUrl, keyfunc.Options{}); err == nil {
+			return jwks.Keyfunc, nil
+		} else {
+			return nil, err
+		}
 	}
 
 	if p.config.Jwks != nil {
-		return keyfunc.NewJSON(p.config.Jwks)
+		if jwks, err := keyfunc.NewJSON(p.config.Jwks); err == nil {
+			return jwks.Keyfunc, nil
+		} else {
+			return nil, err
+		}
 	}
 
 	return nil, nil
