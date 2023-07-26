@@ -16,8 +16,8 @@ type Config struct {
 	CookieName   string          `json:"cookieName"`
 	HeaderName   string          `json:"headerName"`
 	VerifySecret string          `json:"verifySecret"`
-	JwksUrl      string          `json:"JwksUrl"`
-	Jwks         json.RawMessage `json:"Jwks"`
+	JwksUrl      string          `json:"jwksUrl"`
+	Jwks         json.RawMessage `json:"jwks"`
 }
 
 func FromJson(data []byte) (*Provider, error) {
