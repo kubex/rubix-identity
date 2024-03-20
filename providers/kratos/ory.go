@@ -37,7 +37,7 @@ func (p Provider) CreateSession(ctx *identity.Request) (*identity.Session, error
 	iSession := identity.NewSession(ctx)
 	iSession.ProviderContext = rCtx
 
-	session, _, _ := p.api.FrontendApi.ToSession(rCtx).Cookie(p.config.CookieName + "=" + kratosCookie).Execute()
+	session, _, _ := p.api.FrontendAPI.ToSession(rCtx).Cookie(p.config.CookieName + "=" + kratosCookie).Execute()
 	if session != nil {
 		iSession.IsLoggedIn = true
 
