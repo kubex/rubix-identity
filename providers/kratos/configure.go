@@ -9,6 +9,7 @@ const ProviderKey = "kratos"
 
 type Config struct {
 	PublicApi  string `json:"publicApi"`
+	AdminApi   string `json:"adminApi"`
 	LoginUrl   string `json:"loginUrl"`
 	LogoutUrl  string `json:"logoutUrl"`
 	SignupUrl  string `json:"signupUrl"`

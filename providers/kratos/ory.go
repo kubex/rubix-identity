@@ -9,9 +9,11 @@ import (
 )
 
 type Provider struct {
-	config    Config
-	oryConfig *ory.Configuration
-	api       *ory.APIClient
+	config         Config
+	oryConfig      *ory.Configuration
+	api            *ory.APIClient
+	adminOryConfig *ory.Configuration
+	adminApi       *ory.APIClient
 }
 
 func New(cfg Config) (*Provider, error) {
@@ -22,6 +24,10 @@ func New(cfg Config) (*Provider, error) {
 	p.oryConfig = ory.NewConfiguration()
 	p.oryConfig.Servers = ory.ServerConfigurations{{URL: cfg.PublicApi}}
 	p.api = ory.NewAPIClient(p.oryConfig)
+
+	p.adminOryConfig = ory.NewConfiguration()
+	p.adminOryConfig.Servers = ory.ServerConfigurations{{URL: cfg.AdminApi}}
+	p.adminApi = ory.NewAPIClient(p.adminOryConfig)
 
 	return p, nil
 }
@@ -76,7 +82,7 @@ func (p Provider) RegisterURL(ctx *identity.Request) string {
 
 func (p Provider) ListUsers(ctx context.Context, ids ...string) ([]*identity.User, error) {
 	var users []*identity.User
-	iPl := p.api.IdentityAPI.ListIdentities(ctx)
+	iPl := p.adminApi.IdentityAPI.ListIdentities(ctx)
 	iPl.Ids(ids)
 	identities, resp, err := p.api.IdentityAPI.ListIdentitiesExecute(iPl)
 	if err != nil {
