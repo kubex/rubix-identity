@@ -71,6 +71,9 @@ func (p Provider) verifyToken(token *jwt.Token) (interface{}, error) {
 
 func (p Provider) IsLoggedIn(session *identity.Session) bool      { return session.IsLoggedIn }
 func (p Provider) HydrateSession(session *identity.Session) error { return nil }
+func (p Provider) ListUsers(ctx context.Context, ids ...string) ([]*identity.User, error) {
+	return nil, nil
+}
 
 func (p Provider) CreateSession(ctx *identity.Request) (*identity.Session, error) {
 

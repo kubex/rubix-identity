@@ -1,6 +1,7 @@
 package anonymous
 
 import (
+	"context"
 	"log"
 	"strings"
 	"time"
@@ -16,6 +17,9 @@ func (p Provider) LoginUrl(ctx *identity.Request) string    { return "" }
 func (p Provider) LogoutUrl(ctx *identity.Request) string   { return "" }
 func (p Provider) RegisterURL(ctx *identity.Request) string { return "" }
 func (p Provider) CacheID(ctx *identity.Request) string     { return "" }
+func (p Provider) ListUsers(ctx context.Context, ids ...string) ([]*identity.User, error) {
+	return nil, nil
+}
 
 func (p Provider) IsLoggedIn(session *identity.Session) bool {
 	if p.RequireIP == "" {

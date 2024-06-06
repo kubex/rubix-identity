@@ -9,6 +9,10 @@ type User struct {
 	IdentityID string
 	Username   string
 	Name       string
+	Email      string
+	State      string
+	MFA        bool
+	Verified   bool
 }
 
 type Session struct {

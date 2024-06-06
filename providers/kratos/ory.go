@@ -3,6 +3,7 @@ package kratos
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"github.com/kubex/rubix-identity/identity"
 	ory "github.com/ory/client-go"
 )
@@ -57,17 +58,7 @@ func (p Provider) CreateSession(ctx *identity.Request) (*identity.Session, error
 			}
 		}
 
-		iSession.User = &identity.User{
-			IdentityID: session.Identity.Id,
-		}
-
-		if traitBytes, err := json.Marshal(session.Identity.Traits); err == nil {
-			iTrait := identityTrait{}
-			if err := json.Unmarshal(traitBytes, &iTrait); err == nil {
-				iSession.User.Username = iTrait.Email
-				iSession.User.Name = iTrait.Name.First + " " + iTrait.Name.Last
-			}
-		}
+		iSession.User = identityToUser(*session.Identity)
 	}
 
 	return iSession, nil
@@ -81,4 +72,41 @@ func (p Provider) LogoutUrl(ctx *identity.Request) string { return p.config.Logo
 
 func (p Provider) RegisterURL(ctx *identity.Request) string {
 	return p.config.SignupUrl + "?return_to=" + ctx.RequestUri
+}
+
+func (p Provider) ListUsers(ctx context.Context, ids ...string) ([]*identity.User, error) {
+	var users []*identity.User
+	iPl := p.api.IdentityAPI.ListIdentities(ctx)
+	iPl.Ids(ids)
+	identities, resp, err := p.api.IdentityAPI.ListIdentitiesExecute(iPl)
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode != 200 {
+		return nil, errors.New("failed to list identities")
+	}
+
+	for _, i := range identities {
+		users = append(users, identityToUser(i))
+	}
+
+	return users, nil
+
+}
+
+func identityToUser(src ory.Identity) *identity.User {
+	user := &identity.User{
+		IdentityID: src.Id,
+		State:      *src.State,
+	}
+
+	if traitBytes, err := json.Marshal(src.Traits); err == nil {
+		iTrait := identityTrait{}
+		if err := json.Unmarshal(traitBytes, &iTrait); err == nil {
+			user.Username = iTrait.Email
+			user.Email = iTrait.Email
+			user.Name = iTrait.Name.First + " " + iTrait.Name.Last
+		}
+	}
+	return user
 }

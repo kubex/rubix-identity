@@ -1,5 +1,7 @@
 package identity
 
+import "context"
+
 type Provider interface {
 	IsLoggedIn(*Session) bool      // Quick is logged in check
 	HydrateSession(*Session) error // Hydrate session with user data
@@ -9,4 +11,6 @@ type Provider interface {
 	LoginUrl(ctx *Request) string
 	LogoutUrl(ctx *Request) string
 	RegisterURL(ctx *Request) string
+
+	ListUsers(ctx context.Context, ids ...string) ([]*User, error)
 }
