@@ -7,7 +7,7 @@ import (
 	"github.com/MicahParks/keyfunc/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/kubex/rubix-identity/identity"
-	ory "github.com/ory/client-go"
+	ory "github.com/ory/kratos-client-go"
 	"strings"
 	"time"
 )

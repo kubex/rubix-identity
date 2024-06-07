@@ -1,7 +1,7 @@
 package oathkeeper
 
 import (
-	ory "github.com/ory/client-go"
+	ory "github.com/ory/kratos-client-go"
 )
 
 type oryJwt struct {

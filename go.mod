@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/MicahParks/keyfunc/v2 v2.1.0
 	github.com/golang-jwt/jwt/v5 v5.2.1
-	github.com/ory/client-go v1.9.0
+	github.com/ory/kratos-client-go v1.2.0
 )
 
 require (

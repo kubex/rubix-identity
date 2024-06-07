@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/kubex/rubix-identity/identity"
-	ory "github.com/ory/client-go"
+	ory "github.com/ory/kratos-client-go"
 )
 
 type Provider struct {
@@ -82,8 +82,7 @@ func (p Provider) RegisterURL(ctx *identity.Request) string {
 
 func (p Provider) ListUsers(ctx context.Context, ids ...string) ([]*identity.User, error) {
 	var users []*identity.User
-	iPl := p.adminApi.IdentityAPI.ListIdentities(ctx).Ids(ids)
-	identities, resp, err := p.api.IdentityAPI.ListIdentitiesExecute(iPl)
+	identities, resp, err := p.adminApi.IdentityAPI.ListIdentities(ctx).Ids(ids).Execute()
 	if err != nil {
 		return nil, err
 	}
