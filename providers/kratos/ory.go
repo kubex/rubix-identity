@@ -82,8 +82,7 @@ func (p Provider) RegisterURL(ctx *identity.Request) string {
 
 func (p Provider) ListUsers(ctx context.Context, ids ...string) ([]*identity.User, error) {
 	var users []*identity.User
-	iPl := p.adminApi.IdentityAPI.ListIdentities(ctx)
-	iPl.Ids(ids)
+	iPl := p.adminApi.IdentityAPI.ListIdentities(ctx).Ids(ids)
 	identities, resp, err := p.api.IdentityAPI.ListIdentitiesExecute(iPl)
 	if err != nil {
 		return nil, err
