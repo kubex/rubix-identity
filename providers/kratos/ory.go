@@ -82,20 +82,33 @@ func (p Provider) RegisterURL(ctx *identity.Request) string {
 
 func (p Provider) ListUsers(ctx context.Context, ids ...string) ([]*identity.User, error) {
 	var users []*identity.User
-	identities, resp, err := p.adminApi.IdentityAPI.ListIdentities(ctx).Ids(ids).Execute()
-	if err != nil {
-		return nil, err
-	}
-	if resp.StatusCode != 200 {
-		return nil, errors.New("failed to list identities")
-	}
+	switch len(ids) {
+	case 0:
+		return nil, nil
+	case 1:
+		ident, resp, err := p.adminApi.IdentityAPI.GetIdentity(ctx, ids[0]).Execute()
+		if err != nil {
+			return nil, err
+		}
+		if resp.StatusCode != 200 {
+			return nil, errors.New("failed to list identities")
+		}
+		users = append(users, identityToUser(*ident))
+	default:
+		identities, resp, err := p.adminApi.IdentityAPI.ListIdentities(ctx).Ids(ids).Execute()
+		if err != nil {
+			return nil, err
+		}
+		if resp.StatusCode != 200 {
+			return nil, errors.New("failed to list identities")
+		}
 
-	for _, i := range identities {
-		users = append(users, identityToUser(i))
+		for _, i := range identities {
+			users = append(users, identityToUser(i))
+		}
 	}
 
 	return users, nil
-
 }
 
 func identityToUser(src ory.Identity) *identity.User {
